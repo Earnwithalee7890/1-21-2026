@@ -72,7 +72,7 @@
             lifetime-spent: (+ (get lifetime-spent current) points)
         })
         (map-set redemptions {user: tx-sender, id: rid}
-            {points-spent: points, redeemed-at: stacks-block-height, item: item}
+            {points-spent: points, redeemed-at: block-height, item: item}
         )
         (var-set redemption-nonce (+ rid u1))
         (ok rid)

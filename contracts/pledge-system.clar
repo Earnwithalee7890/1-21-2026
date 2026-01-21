@@ -27,7 +27,7 @@
 
 (define-read-only (is-overdue (pledge-id uint))
     (match (get-pledge pledge-id)
-        p (and (not (get fulfilled p)) (> stacks-block-height (get deadline p)))
+        p (and (not (get fulfilled p)) (> block-height (get deadline p)))
         false
     )
 )
@@ -47,9 +47,9 @@
             beneficiary: beneficiary,
             description: description,
             amount: amount,
-            deadline: (+ stacks-block-height deadline),
+            deadline: (+ block-height deadline),
             fulfilled: false,
-            created-at: stacks-block-height
+            created-at: block-height
         })
         (var-set pledge-nonce (+ pledge-id u1))
         (ok pledge-id)
@@ -74,7 +74,7 @@
     )
         (asserts! (is-eq tx-sender (get pledger pledge)) err-unauthorized)
         (asserts! (not (get fulfilled pledge)) err-already-fulfilled)
-        (asserts! (> stacks-block-height (get deadline pledge)) err-unauthorized)
+        (asserts! (> block-height (get deadline pledge)) err-unauthorized)
         (try! (as-contract (stx-transfer? (get amount pledge) tx-sender (get pledger pledge))))
         (ok (map-delete pledges pledge-id))
     )

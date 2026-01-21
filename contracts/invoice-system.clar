@@ -27,7 +27,7 @@
 
 (define-read-only (is-overdue (invoice-id uint))
     (match (get-invoice invoice-id)
-        inv (and (not (get paid inv)) (> stacks-block-height (get due-block inv)))
+        inv (and (not (get paid inv)) (> block-height (get due-block inv)))
         false
     )
 )
@@ -46,7 +46,7 @@
             client: client,
             description: description,
             amount: amount,
-            due-block: (+ stacks-block-height due-blocks),
+            due-block: (+ block-height due-blocks),
             paid: false,
             paid-at: u0
         })
@@ -63,7 +63,7 @@
         (asserts! (not (get paid inv)) err-already-paid)
         (try! (stx-transfer? (get amount inv) tx-sender (get issuer inv)))
         (ok (map-set invoices invoice-id
-            (merge inv {paid: true, paid-at: stacks-block-height})
+            (merge inv {paid: true, paid-at: block-height})
         ))
     )
 )

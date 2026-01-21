@@ -26,7 +26,7 @@
 
 (define-read-only (is-active-member (user principal))
     (match (get-member user)
-        m (and (get active m) (>= (get expires-at m) stacks-block-height))
+        m (and (get active m) (>= (get expires-at m) block-height))
         false
     )
 )
@@ -41,8 +41,8 @@
         (try! (stx-transfer? (var-get membership-fee) tx-sender contract-owner))
         (var-set member-count (+ (var-get member-count) u1))
         (ok (map-set members tx-sender {
-            joined-at: stacks-block-height,
-            expires-at: (+ stacks-block-height (var-get membership-duration)),
+            joined-at: block-height,
+            expires-at: (+ block-height (var-get membership-duration)),
             tier: u"standard",
             active: true
         }))

@@ -40,7 +40,7 @@
 )
     (let (
         (expense-id (var-get expense-nonce))
-        (month (/ stacks-block-height u4320))
+        (month (/ block-height u4320))
         (current-monthly (get-monthly-total tx-sender month))
     )
         (map-set expenses expense-id {
@@ -48,7 +48,7 @@
             amount: amount,
             category: category,
             description: description,
-            recorded-at: stacks-block-height
+            recorded-at: block-height
         })
         (map-set monthly-totals {owner: tx-sender, month: month}
             {

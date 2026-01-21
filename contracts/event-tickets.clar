@@ -67,7 +67,7 @@
             ticket-price: ticket-price,
             max-tickets: max-tickets,
             sold-count: u0,
-            event-block: (+ stacks-block-height event-in-blocks),
+            event-block: (+ block-height event-in-blocks),
             active: true
         })
         (var-set event-nonce (+ event-id u1))
@@ -92,7 +92,7 @@
         (map-set tickets ticket-id {
             event-id: event-id,
             holder: tx-sender,
-            purchased-at: stacks-block-height,
+            purchased-at: block-height,
             used: false
         })
         (var-set ticket-nonce (+ ticket-id u1))

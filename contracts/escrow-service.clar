@@ -47,7 +47,7 @@
             amount: amount,
             description: description,
             status: u"funded",
-            created-at: stacks-block-height
+            created-at: block-height
         })
         (var-set escrow-nonce (+ escrow-id u1))
         (ok escrow-id)

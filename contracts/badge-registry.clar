@@ -1,4 +1,4 @@
-;; Badge Registry - Clarity 4
+;; Badge Registry - Clarity 3
 ;; Issue and verify badges
 
 (define-constant contract-owner tx-sender)
@@ -78,7 +78,7 @@
         (map-set badges badge-id {
             badge-type-id: type-id,
             holder: recipient,
-            issued-at: stacks-block-height,
+            issued-at: block-height,
             issuer: tx-sender
         })
         (map-set holder-badges {badge-type-id: type-id, holder: recipient}

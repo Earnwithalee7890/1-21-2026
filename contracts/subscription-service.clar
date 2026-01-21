@@ -36,7 +36,7 @@
 
 (define-read-only (is-subscribed (plan-id uint) (subscriber principal))
     (match (get-subscription plan-id subscriber)
-        sub (and (get active sub) (>= (get end-block sub) stacks-block-height))
+        sub (and (get active sub) (>= (get end-block sub) block-height))
         false
     )
 )
@@ -71,8 +71,8 @@
         (try! (stx-transfer? (get price plan) tx-sender (get creator plan)))
         (ok (map-set subscriptions {plan-id: plan-id, subscriber: tx-sender}
             {
-                start-block: stacks-block-height,
-                end-block: (+ stacks-block-height (get duration plan)),
+                start-block: block-height,
+                end-block: (+ block-height (get duration plan)),
                 active: true
             }
         ))

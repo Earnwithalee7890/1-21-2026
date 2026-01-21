@@ -50,7 +50,7 @@
             title: title,
             description: description,
             reward: reward,
-            deadline: (+ stacks-block-height duration),
+            deadline: (+ block-height duration),
             claimed: false,
             claimer: none
         })
@@ -63,10 +63,10 @@
     (let (
         (bounty (unwrap! (get-bounty bounty-id) err-not-found))
     )
-        (asserts! (<= stacks-block-height (get deadline bounty)) err-expired)
+        (asserts! (<= block-height (get deadline bounty)) err-expired)
         (asserts! (not (get claimed bounty)) err-already-claimed)
         (ok (map-set submissions {bounty-id: bounty-id, submitter: tx-sender}
-            {solution: solution, submitted-at: stacks-block-height, approved: false}
+            {solution: solution, submitted-at: block-height, approved: false}
         ))
     )
 )
@@ -95,7 +95,7 @@
     )
         (asserts! (is-eq tx-sender (get creator bounty)) err-unauthorized)
         (asserts! (not (get claimed bounty)) err-already-claimed)
-        (asserts! (> stacks-block-height (get deadline bounty)) err-expired)
+        (asserts! (> block-height (get deadline bounty)) err-expired)
         (try! (as-contract (stx-transfer? (get reward bounty) tx-sender (get creator bounty))))
         (ok true)
     )

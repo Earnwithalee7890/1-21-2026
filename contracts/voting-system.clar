@@ -36,7 +36,7 @@
 
 (define-read-only (is-poll-open (poll-id uint))
     (match (get-poll poll-id)
-        p (and (get open p) (<= stacks-block-height (get end-block p)))
+        p (and (get open p) (<= block-height (get end-block p)))
         false
     )
 )
@@ -53,7 +53,7 @@
             question: question,
             yes-votes: u0,
             no-votes: u0,
-            end-block: (+ stacks-block-height duration),
+            end-block: (+ block-height duration),
             open: true
         })
         (var-set poll-nonce (+ poll-id u1))
@@ -68,7 +68,7 @@
         (asserts! (is-poll-open poll-id) err-poll-closed)
         (asserts! (not (has-voted poll-id tx-sender)) err-already-voted)
         (map-set votes {poll-id: poll-id, voter: tx-sender}
-            {vote: true, voted-at: stacks-block-height}
+            {vote: true, voted-at: block-height}
         )
         (ok (map-set polls poll-id
             (merge poll {yes-votes: (+ (get yes-votes poll) u1)})
@@ -83,7 +83,7 @@
         (asserts! (is-poll-open poll-id) err-poll-closed)
         (asserts! (not (has-voted poll-id tx-sender)) err-already-voted)
         (map-set votes {poll-id: poll-id, voter: tx-sender}
-            {vote: false, voted-at: stacks-block-height}
+            {vote: false, voted-at: block-height}
         )
         (ok (map-set polls poll-id
             (merge poll {no-votes: (+ (get no-votes poll) u1)})

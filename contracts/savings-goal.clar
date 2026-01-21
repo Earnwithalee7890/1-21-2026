@@ -44,7 +44,7 @@
             name: name,
             target: target,
             saved: u0,
-            deadline: (+ stacks-block-height deadline),
+            deadline: (+ block-height deadline),
             withdrawn: false
         })
         (var-set goal-nonce (+ goal-id u1))
@@ -71,7 +71,7 @@
     )
         (asserts! (is-eq tx-sender (get owner goal)) err-unauthorized)
         (asserts! (not (get withdrawn goal)) err-unauthorized)
-        (asserts! (or (>= (get saved goal) (get target goal)) (> stacks-block-height (get deadline goal))) err-goal-not-reached)
+        (asserts! (or (>= (get saved goal) (get target goal)) (> block-height (get deadline goal))) err-goal-not-reached)
         (map-set savings-goals goal-id (merge goal {withdrawn: true}))
         (try! (as-contract (stx-transfer? (get saved goal) tx-sender (get owner goal))))
         (ok (get saved goal))

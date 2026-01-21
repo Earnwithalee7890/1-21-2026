@@ -45,7 +45,7 @@
             reward: reward,
             assignee: none,
             completed: false,
-            created-at: stacks-block-height
+            created-at: block-height
         })
         (var-set task-nonce (+ task-id u1))
         (ok task-id)

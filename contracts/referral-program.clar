@@ -42,7 +42,7 @@
         (asserts! (not (is-eq tx-sender referrer)) err-self-referral)
         (map-set referrals tx-sender {
             referrer: referrer,
-            referred-at: stacks-block-height,
+            referred-at: block-height,
             bonus-paid: false
         })
         (map-set referrer-stats referrer

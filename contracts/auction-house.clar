@@ -30,7 +30,7 @@
 
 (define-read-only (is-auction-active (auction-id uint))
     (match (get-auction auction-id)
-        a (and (not (get settled a)) (<= stacks-block-height (get end-block a)))
+        a (and (not (get settled a)) (<= block-height (get end-block a)))
         false
     )
 )
@@ -51,7 +51,7 @@
             start-price: start-price,
             current-bid: u0,
             highest-bidder: none,
-            end-block: (+ stacks-block-height duration),
+            end-block: (+ block-height duration),
             settled: false
         })
         (var-set auction-nonce (+ auction-id u1))
@@ -83,7 +83,7 @@
         (auction (unwrap! (get-auction auction-id) err-not-found))
         (winner (unwrap! (get highest-bidder auction) err-not-found))
     )
-        (asserts! (> stacks-block-height (get end-block auction)) err-auction-ended)
+        (asserts! (> block-height (get end-block auction)) err-auction-ended)
         (asserts! (not (get settled auction)) err-already-completed)
         (map-set auctions auction-id (merge auction {settled: true}))
         (try! (as-contract (stx-transfer? (get current-bid auction) tx-sender (get seller auction))))

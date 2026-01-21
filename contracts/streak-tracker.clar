@@ -29,7 +29,7 @@
 (define-read-only (can-checkin (user principal))
     (let (
         (user-data (get-streak user))
-        (blocks-since (- stacks-block-height (get last-checkin user-data)))
+        (blocks-since (- block-height (get last-checkin user-data)))
     )
         (>= blocks-since blocks-per-day)
     )
@@ -38,7 +38,7 @@
 (define-public (checkin)
     (let (
         (user-data (get-streak tx-sender))
-        (blocks-since (- stacks-block-height (get last-checkin user-data)))
+        (blocks-since (- block-height (get last-checkin user-data)))
         (streak-continues (and (>= blocks-since blocks-per-day) (<= blocks-since (* blocks-per-day u2))))
         (new-streak (if streak-continues
             (+ (get current-streak user-data) u1)
@@ -53,7 +53,7 @@
         (ok (map-set streaks tx-sender {
             current-streak: new-streak,
             longest-streak: new-longest,
-            last-checkin: stacks-block-height,
+            last-checkin: block-height,
             total-checkins: (+ (get total-checkins user-data) u1)
         }))
     )

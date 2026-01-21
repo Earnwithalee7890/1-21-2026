@@ -69,7 +69,7 @@
         (map-set bookings booking-id {
             service-id: service-id,
             client: tx-sender,
-            booked-at: stacks-block-height,
+            booked-at: block-height,
             completed: false,
             paid: false
         })

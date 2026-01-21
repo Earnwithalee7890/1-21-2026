@@ -51,7 +51,7 @@
             owner: tx-sender,
             name: name,
             description: description,
-            created-at: stacks-block-height,
+            created-at: block-height,
             public: public
         })
         (var-set wishlist-nonce (+ wishlist-id u1))

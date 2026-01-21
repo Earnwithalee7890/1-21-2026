@@ -67,7 +67,7 @@
             (merge cause {raised: (+ (get raised cause) donation)})
         )
         (ok (map-set donations {cause-id: cause-id, donor: tx-sender}
-            {amount: amount, donated-at: stacks-block-height}
+            {amount: amount, donated-at: block-height}
         ))
     )
 )

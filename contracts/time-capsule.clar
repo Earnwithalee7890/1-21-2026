@@ -27,7 +27,7 @@
 
 (define-read-only (is-unlocked (capsule-id uint))
     (match (get-capsule capsule-id)
-        c (>= stacks-block-height (get unlock-block c))
+        c (>= block-height (get unlock-block c))
         false
     )
 )
@@ -46,7 +46,7 @@
             creator: tx-sender,
             recipient: recipient,
             message: message,
-            unlock-block: (+ stacks-block-height unlock-delay),
+            unlock-block: (+ block-height unlock-delay),
             revealed: false,
             deposit: deposit
         })

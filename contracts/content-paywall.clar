@@ -69,7 +69,7 @@
             (merge content {purchase-count: (+ (get purchase-count content) u1)})
         )
         (ok (map-set purchases {content-id: content-id, buyer: tx-sender}
-            {purchased-at: stacks-block-height, price-paid: (get price content)}
+            {purchased-at: block-height, price-paid: (get price content)}
         ))
     )
 )

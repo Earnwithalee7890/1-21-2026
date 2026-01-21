@@ -51,7 +51,7 @@
             description: description,
             goal: goal,
             raised: u0,
-            deadline: (+ stacks-block-height duration),
+            deadline: (+ block-height duration),
             claimed: false
         })
         (var-set campaign-nonce (+ campaign-id u1))
@@ -63,13 +63,13 @@
     (let (
         (campaign (unwrap! (get-campaign campaign-id) err-not-found))
     )
-        (asserts! (<= stacks-block-height (get deadline campaign)) err-campaign-ended)
+        (asserts! (<= block-height (get deadline campaign)) err-campaign-ended)
         (try! (stx-transfer? amount tx-sender (as-contract tx-sender)))
         (map-set campaigns campaign-id
             (merge campaign {raised: (+ (get raised campaign) amount)})
         )
         (ok (map-set contributions {campaign-id: campaign-id, contributor: tx-sender}
-            {amount: amount, contributed-at: stacks-block-height}
+            {amount: amount, contributed-at: block-height}
         ))
     )
 )
@@ -81,7 +81,7 @@
         (payout (- (get raised campaign) fee))
     )
         (asserts! (is-eq tx-sender (get creator campaign)) err-unauthorized)
-        (asserts! (> stacks-block-height (get deadline campaign)) err-campaign-ended)
+        (asserts! (> block-height (get deadline campaign)) err-campaign-ended)
         (asserts! (>= (get raised campaign) (get goal campaign)) err-goal-not-met)
         (asserts! (not (get claimed campaign)) err-unauthorized)
         (map-set campaigns campaign-id (merge campaign {claimed: true}))
@@ -96,7 +96,7 @@
         (campaign (unwrap! (get-campaign campaign-id) err-not-found))
         (contribution (unwrap! (get-contribution campaign-id tx-sender) err-not-found))
     )
-        (asserts! (> stacks-block-height (get deadline campaign)) err-campaign-ended)
+        (asserts! (> block-height (get deadline campaign)) err-campaign-ended)
         (asserts! (< (get raised campaign) (get goal campaign)) err-goal-not-met)
         (try! (as-contract (stx-transfer? (get amount contribution) tx-sender tx-sender)))
         (ok (get amount contribution))
