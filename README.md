@@ -1,71 +1,45 @@
-# Stacks Smart Contracts Collection
+# Stacks Smart Contracts - January 21, 2026
 
-A comprehensive collection of 25 production-ready Clarity smart contracts for the Stacks blockchain.
+25 production-ready Clarity 4 smart contracts for Stacks blockchain.
 
-## 📦 Contracts
+## Contracts List
 
-### DeFi (5 contracts)
-| Contract | Description |
-|----------|-------------|
-| `token-swap-dex.clar` | Automated Market Maker (AMM) for token swaps |
-| `yield-farming.clar` | Stake tokens to earn rewards over time |
-| `flash-loan.clar` | Uncollateralized flash loans |
-| `lending-protocol.clar` | Collateralized lending with liquidation |
-| `options-trading.clar` | Call/Put options trading |
+| # | Contract | Description |
+|---|----------|-------------|
+| 1 | `freelance-marketplace` | Create and manage freelance gigs |
+| 2 | `service-booking` | Book and manage service appointments |
+| 3 | `crowdfunding-platform` | Create and fund campaigns |
+| 4 | `escrow-service` | Secure escrow for P2P trades |
+| 5 | `bounty-board` | Create and claim bounties |
+| 6 | `subscription-service` | Recurring subscription payments |
+| 7 | `donation-platform` | Accept and track donations |
+| 8 | `tip-jar` | Simple tip collection |
+| 9 | `invoice-system` | Create and pay invoices |
+| 10 | `voting-system` | Create polls and vote |
+| 11 | `membership-system` | Manage paid memberships |
+| 12 | `referral-program` | Track and reward referrals |
+| 13 | `reward-points` | Loyalty points system |
+| 14 | `task-board` | Tasks for rewards |
+| 15 | `auction-house` | Create and bid on auctions |
+| 16 | `savings-goal` | Save STX toward goals |
+| 17 | `split-payment` | Split payments between recipients |
+| 18 | `time-capsule` | Lock messages to reveal later |
+| 19 | `pledge-system` | Make and fulfill pledges |
+| 20 | `content-paywall` | Pay to access content |
+| 21 | `badge-registry` | Issue and verify badges |
+| 22 | `streak-tracker` | Track daily check-in streaks |
+| 23 | `expense-tracker` | Track and categorize expenses |
+| 24 | `wishlist-registry` | Create wishlists and receive gifts |
+| 25 | `event-tickets` | Create events and sell tickets |
 
-### NFT (5 contracts)
-| Contract | Description |
-|----------|-------------|
-| `nft-marketplace.clar` | Buy, sell, auction NFTs with royalties |
-| `dynamic-nft.clar` | Evolving NFTs with experience system |
-| `nft-rental.clar` | Rent NFTs for temporary use |
-| `fractional-nft.clar` | Split NFT ownership into tokens |
-| `nft-whitelist-mint.clar` | Collection minting with whitelist |
+## Pattern Used
 
-### DAO/Governance (5 contracts)
-| Contract | Description |
-|----------|-------------|
-| `dao-governance.clar` | Proposals and token-weighted voting |
-| `multi-sig-treasury.clar` | Multi-signature fund management |
-| `token-vesting.clar` | Time-locked token distribution |
-| `reputation-system.clar` | On-chain reputation with endorsements |
-| `bounty-platform.clar` | Create and claim bounties |
+All contracts follow the proven Clarity 4 syntax:
+- `string-utf8` for text
+- `stacks-block-height` for timestamps
+- `as-contract` for escrow patterns
+- Standard error handling with `(err uXXXX)`
 
-### Utility (5 contracts)
-| Contract | Description |
-|----------|-------------|
-| `escrow-service.clar` | Secure P2P escrow with disputes |
-| `subscription-service.clar` | Recurring payment subscriptions |
-| `time-lock-wallet.clar` | Lock tokens until specified time |
-| `crowdfunding.clar` | Crowdfunding with goals and refunds |
-| `lottery-system.clar` | Verifiably random lottery |
+## License
 
-### Gaming/Advanced (5 contracts)
-| Contract | Description |
-|----------|-------------|
-| `prediction-market.clar` | Create and bet on predictions |
-| `token-launchpad.clar` | Fair token distribution |
-| `nft-staking-game.clar` | Stake gaming NFTs for rewards |
-| `achievement-system.clar` | On-chain achievements and badges |
-| `liquid-staking.clar` | Liquid staking tokens (stSTX) |
-
-## 🚀 Getting Started
-
-```bash
-# Clone the repository
-git clone https://github.com/Earnwithalee7890/1-21-2026.git
-
-# Navigate to contracts
-cd 1-21-2026/contracts
-
-# Deploy using Clarinet
-clarinet deploy
-```
-
-## 📄 License
-
-MIT License - Feel free to use these contracts in your projects.
-
-## 🔗 Built for Stacks Builder Rewards
-
-Created: January 21, 2026
+MIT License

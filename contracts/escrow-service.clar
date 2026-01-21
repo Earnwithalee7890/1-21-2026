@@ -1,135 +1,92 @@
-;; Escrow Service
-;; Secure escrow for peer-to-peer transactions
+;; Escrow Service - Clarity 4
+;; Secure escrow for peer-to-peer trades
 
-(define-map escrows
-  { escrow-id: uint }
-  {
-    buyer: principal,
-    seller: principal,
-    arbiter: principal,
-    amount: uint,
-    status: (string-ascii 10),
-    created-at: uint,
-    deadline: uint,
-    description: (string-ascii 200)
-  }
-)
-
-(define-map disputes
-  { escrow-id: uint }
-  {
-    raised-by: principal,
-    reason: (string-ascii 200),
-    resolved: bool,
-    winner: (optional principal)
-  }
-)
+(define-constant contract-owner tx-sender)
+(define-constant err-not-found (err u6000))
+(define-constant err-unauthorized (err u6001))
+(define-constant err-invalid-state (err u6002))
 
 (define-data-var escrow-nonce uint u0)
-(define-data-var arbiter-fee uint u200)
-(define-constant ERR-NOT-AUTHORIZED (err u100))
-(define-constant ERR-ESCROW-NOT-FOUND (err u101))
-(define-constant ERR-INVALID-STATUS (err u102))
-(define-constant ERR-ALREADY-DISPUTED (err u103))
-(define-constant ERR-DEADLINE-PASSED (err u104))
+(define-data-var arbiter-fee uint u100)
+
+(define-map escrows
+    uint
+    {
+        buyer: principal,
+        seller: principal,
+        arbiter: principal,
+        amount: uint,
+        description: (string-utf8 200),
+        status: (string-utf8 20),
+        created-at: uint
+    }
+)
 
 (define-read-only (get-escrow (escrow-id uint))
-  (map-get? escrows { escrow-id: escrow-id })
+    (map-get? escrows escrow-id)
 )
 
-(define-read-only (get-dispute (escrow-id uint))
-  (map-get? disputes { escrow-id: escrow-id })
+(define-read-only (get-escrow-count)
+    (var-get escrow-nonce)
 )
 
-(define-public (create-escrow (seller principal) (arbiter principal) (amount uint) (deadline-blocks uint) (description (string-ascii 200)))
-  (let (
-    (escrow-id (var-get escrow-nonce))
-  )
-    (map-set escrows
-      { escrow-id: escrow-id }
-      {
-        buyer: tx-sender,
-        seller: seller,
-        arbiter: arbiter,
-        amount: amount,
-        status: "funded",
-        created-at: block-height,
-        deadline: (+ block-height deadline-blocks),
-        description: description
-      }
+(define-public (create-escrow
+    (seller principal)
+    (arbiter principal)
+    (amount uint)
+    (description (string-utf8 200))
+)
+    (let (
+        (escrow-id (var-get escrow-nonce))
     )
-    (var-set escrow-nonce (+ escrow-id u1))
-    (ok escrow-id)
-  )
+        (try! (stx-transfer? amount tx-sender (as-contract tx-sender)))
+        (map-set escrows escrow-id {
+            buyer: tx-sender,
+            seller: seller,
+            arbiter: arbiter,
+            amount: amount,
+            description: description,
+            status: u"funded",
+            created-at: stacks-block-height
+        })
+        (var-set escrow-nonce (+ escrow-id u1))
+        (ok escrow-id)
+    )
 )
 
-(define-public (release-funds (escrow-id uint))
-  (let (
-    (escrow (unwrap! (get-escrow escrow-id) ERR-ESCROW-NOT-FOUND))
-  )
-    (asserts! (is-eq tx-sender (get buyer escrow)) ERR-NOT-AUTHORIZED)
-    (asserts! (is-eq (get status escrow) "funded") ERR-INVALID-STATUS)
-    (map-set escrows
-      { escrow-id: escrow-id }
-      (merge escrow { status: "released" })
+(define-public (release-to-seller (escrow-id uint))
+    (let (
+        (escrow (unwrap! (get-escrow escrow-id) err-not-found))
     )
-    (ok (get amount escrow))
-  )
+        (asserts! (is-eq tx-sender (get buyer escrow)) err-unauthorized)
+        (map-set escrows escrow-id (merge escrow {status: u"released"}))
+        (try! (as-contract (stx-transfer? (get amount escrow) tx-sender (get seller escrow))))
+        (ok true)
+    )
 )
 
-(define-public (refund (escrow-id uint))
-  (let (
-    (escrow (unwrap! (get-escrow escrow-id) ERR-ESCROW-NOT-FOUND))
-  )
-    (asserts! (is-eq tx-sender (get seller escrow)) ERR-NOT-AUTHORIZED)
-    (asserts! (is-eq (get status escrow) "funded") ERR-INVALID-STATUS)
-    (map-set escrows
-      { escrow-id: escrow-id }
-      (merge escrow { status: "refunded" })
+(define-public (refund-to-buyer (escrow-id uint))
+    (let (
+        (escrow (unwrap! (get-escrow escrow-id) err-not-found))
     )
-    (ok (get amount escrow))
-  )
+        (asserts! (is-eq tx-sender (get seller escrow)) err-unauthorized)
+        (map-set escrows escrow-id (merge escrow {status: u"refunded"}))
+        (try! (as-contract (stx-transfer? (get amount escrow) tx-sender (get buyer escrow))))
+        (ok true)
+    )
 )
 
-(define-public (raise-dispute (escrow-id uint) (reason (string-ascii 200)))
-  (let (
-    (escrow (unwrap! (get-escrow escrow-id) ERR-ESCROW-NOT-FOUND))
-  )
-    (asserts! (or (is-eq tx-sender (get buyer escrow)) (is-eq tx-sender (get seller escrow))) ERR-NOT-AUTHORIZED)
-    (asserts! (is-eq (get status escrow) "funded") ERR-INVALID-STATUS)
-    (asserts! (is-none (get-dispute escrow-id)) ERR-ALREADY-DISPUTED)
-    (map-set disputes
-      { escrow-id: escrow-id }
-      {
-        raised-by: tx-sender,
-        reason: reason,
-        resolved: false,
-        winner: none
-      }
+(define-public (resolve-dispute (escrow-id uint) (release-to-seller bool))
+    (let (
+        (escrow (unwrap! (get-escrow escrow-id) err-not-found))
+        (fee (/ (* (get amount escrow) (var-get arbiter-fee)) u10000))
+        (payout (- (get amount escrow) fee))
+        (recipient (if release-to-seller (get seller escrow) (get buyer escrow)))
     )
-    (map-set escrows
-      { escrow-id: escrow-id }
-      (merge escrow { status: "disputed" })
+        (asserts! (is-eq tx-sender (get arbiter escrow)) err-unauthorized)
+        (map-set escrows escrow-id (merge escrow {status: u"resolved"}))
+        (try! (as-contract (stx-transfer? payout tx-sender recipient)))
+        (try! (as-contract (stx-transfer? fee tx-sender (get arbiter escrow))))
+        (ok true)
     )
-    (ok true)
-  )
-)
-
-(define-public (resolve-dispute (escrow-id uint) (winner principal))
-  (let (
-    (escrow (unwrap! (get-escrow escrow-id) ERR-ESCROW-NOT-FOUND))
-    (dispute (unwrap! (get-dispute escrow-id) ERR-ESCROW-NOT-FOUND))
-  )
-    (asserts! (is-eq tx-sender (get arbiter escrow)) ERR-NOT-AUTHORIZED)
-    (asserts! (is-eq (get status escrow) "disputed") ERR-INVALID-STATUS)
-    (map-set disputes
-      { escrow-id: escrow-id }
-      (merge dispute { resolved: true, winner: (some winner) })
-    )
-    (map-set escrows
-      { escrow-id: escrow-id }
-      (merge escrow { status: "resolved" })
-    )
-    (ok (get amount escrow))
-  )
 )
